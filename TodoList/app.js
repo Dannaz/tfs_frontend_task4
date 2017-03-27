@@ -484,3 +484,15 @@ stats = {
     todo: todoList.length - tasksDone
 };
 renderStats();
+// Дата создания и редактирования в Todo
+
+class AccessDate {
+    constructor() {
+        this._date = new Date();
+    }
+
+    get formatedDate() {
+        var time = `${this._date.getHours()}:${this._date.getMinutes()}:${this._date.getSeconds()}`;
+        return time;
+    }
+}
