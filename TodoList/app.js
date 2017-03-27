@@ -109,7 +109,7 @@ var stats = {
 
 // необходимые DOM элементы
 var statsElement = document.querySelector('.statistic');
-var statsDonelElement = statsElement.querySelector('.statistic__done');
+var statsDoneElement = statsElement.querySelector('.statistic__done');
 var statsTodoElement = statsElement.querySelector('.statistic__left');
 var statsTotalElement = statsElement.querySelector('.statistic__total');
 
@@ -118,7 +118,7 @@ var statsTotalElement = statsElement.querySelector('.statistic__total');
  * отрисовывает статистику в DOM
  */
 function renderStats() {
-    statsDonelElement.textContent = stats.done;
+    statsDoneElement.textContent = stats.done;
     statsTodoElement.textContent = stats.todo;
     statsTotalElement.textContent = stats.done + stats.todo;
 }
@@ -165,6 +165,53 @@ function deleteFromStats(isTodo) {
     renderStats();
 }
 
+
+class Statistic {
+    constructor(todo, done) {
+        this.todo = todo;
+        this.done = done;
+        this.statsElement = document.querySelector('.statistic');
+        this.statsDoneElement = statsElement.querySelector('.statistic__done');
+        this.statsTodoElement = statsElement.querySelector('.statistic__left');
+        this.statsTotalElement = statsElement.querySelector('.statistic__total');
+    }
+
+    render() {
+        this.statsDoneElement.textContent = this.done;
+        this.statsTodoElement.textContent = this.todo;
+        this.statsTotalElement.textContent = this.done + this.todo;
+    }
+
+    add(isTodo) {
+        if (isTodo) {
+            this.todo++;
+        } else {
+            this.done++;
+        }
+        this.render();
+    }
+
+    change(isTodo) {
+        if(isTodo) {
+            this.todo++;
+            this.done--;
+        } else {
+            this.todo--;
+            this.done++;
+        }
+        this.render();
+    }
+
+    delete(isTodo) {
+        if (isTodo) {
+            this.todo--;
+        } else {
+            this.done--;
+        }
+        this.render();
+    }
+
+}
 // теперь надо переписать старые методы, чтобы учесть статистику
 
 // /**
@@ -369,7 +416,7 @@ function addTodo(name) {
     if (currentFilter !== filterValues.DONE) {
         insertTodoElement(newTask);
     }
-    addToStats(true);
+    statistic.add(true);
 }
 
 // обновление статистики теперь не зависит от того, вставляется ли тудушка в DOM или нет
@@ -405,7 +452,7 @@ function changeTodoStatus(element) {
     }
 
     // и поменять статистику
-    changeStats(!isTodo);
+    statistic.change(!isTodo);
 }
 
 // аналогично при удалении — нужно удалять из todoList
@@ -418,7 +465,7 @@ function deleteTodo(element) {
     var isTodo = task.status === 'todo';
     todoList.splice(todoList.indexOf(task), 1);
     listElement.removeChild(element);
-    deleteFromStats(isTodo);
+    statistic.delete(isTodo);
 }
 
 // отрендерим первоначальный список тудушек
@@ -429,6 +476,8 @@ todoList.forEach(insertTodoElement);
 var tasksDone = todoList.filter(function (item) {
     return item.status === 'done';
 }).length;
+
+var statistic = new Statistic(todoList.length - tasksDone, tasksDone);
 
 stats = {
     done: tasksDone,
