@@ -492,7 +492,15 @@ class AccessDate {
     }
 
     get formatedDate() {
+        var date;
+        var month = this._date.getMonth() + 1;
         var time = `${this._date.getHours()}:${this._date.getMinutes()}:${this._date.getSeconds()}`;
-        return time;
+
+        if (month.toString().length === 1) {
+            month = "0" + month.toString();
+        }
+        date = `${this._date.getDate()}/${month}/${this._date.getFullYear().toString().slice(2)}`;
+
+        return `${time} ${date}`;
     }
 }
