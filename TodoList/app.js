@@ -419,6 +419,7 @@ function changeTodoStatus(element) {
     // меняем статус в todoList
     task.status = isTodo ? 'done' : 'todo';
     task.date.updateAccessDate();
+    updateDatetimeInTodoElement(element, task.date.formattedDate);
 
     // при фильтре "все" нужно поменять класс у тудушки, иначе удалить
     if (currentFilter === filterValues.ALL) {
@@ -436,6 +437,11 @@ function changeTodoStatus(element) {
  * удаляет тудушку, обновляет статистику
  * @param {Element} element
  */
+
+function updateDatetimeInTodoElement(element, date) {
+    element.querySelector('.task__datetime').textContent = date
+}
+
 function deleteTodo(element) {
     var task = getTodo(element.querySelector('.task__name').textContent);
     var isTodo = task.status === 'todo';
