@@ -1,35 +1,49 @@
 "use strict";
 
-class AccessDate {
-    constructor() {
-        this._date = new Date();
-    }
-
-    get formatedDate() {
-        var date;
-        var month = this._date.getMonth() + 1;
-        var time = `${this._date.getHours()}:${this._date.getMinutes()}:${this._date.getSeconds()}`;
-
-        if (month.toString().length === 1) {
-            month = "0" + month.toString();
-        }
-        date = `${this._date.getDate()}/${month}/${this._date.getFullYear().toString().slice(2)}`;
-
-        return `${time} ${date}`;
-    }
-
-    updateAccessDate () {
-        this._date = new Date();
-    }
-
-}
-
 var listElement = document.querySelector('.list');
 var itemElementList = listElement.children;
 
 var ENTER_KEYCODE = 13;
 var templateElement = document.getElementById('todoTemplate');
 var templateContainer = 'content' in templateElement ? templateElement.content : templateElement;
+
+// Объявим классы статистики и даты изменения тудушки
+
+class AccessDate {
+    constructor() {
+        this._date = new Date();
+    }
+
+    get formattedDate() {
+        var date, time;
+        var day = convertToTwoCharacterRepresentation(this._date.getDate()),
+            month = convertToTwoCharacterRepresentation(this._date.getMonth() + 1),
+            year = this._date.getFullYear().toString().slice(2);
+
+        var hours = convertToTwoCharacterRepresentation(this._date.getHours()),
+            minutes = convertToTwoCharacterRepresentation(this._date.getMinutes()),
+            seconds = convertToTwoCharacterRepresentation(this._date.getSeconds());
+
+        time = `${hours}:${minutes}:${seconds}`;
+        date = `${day}/${month}/${year}`;
+
+        return `${time} ${date}`;
+
+        function convertToTwoCharacterRepresentation(value) {
+            if (value.toString().length === 1){
+                value = "0" + value.toString();
+            }
+            return value;
+        }
+    }
+
+
+
+    updateAccessDate () {
+        this._date = new Date();
+    }
+
+}
 
 // сформируем задачки
 /**
@@ -70,7 +84,7 @@ console.log(todoList);
 function addTodoFromTemplate(todo) {
     var newElement = templateContainer.querySelector('.task').cloneNode(true);
     newElement.querySelector('.task__name').textContent = todo.name;
-    newElement.querySelector('.task__datetime').textContent = todo.date.formatedDate;
+    newElement.querySelector('.task__datetime').textContent = todo.date.formattedDate;
     setTodoStatusClassName(newElement, todo.status === 'todo');
 
     return newElement;
@@ -125,79 +139,14 @@ inputElement.addEventListener('keydown', onInputKeydown);
  =            СТАТИСТИКА            =
  ==================================*/
 
-// формируем счетчик статистики
-var stats = {
-    done: 0,
-    todo: 0
-};
-
-// необходимые DOM элементы
-var statsElement = document.querySelector('.statistic');
-var statsDoneElement = statsElement.querySelector('.statistic__done');
-var statsTodoElement = statsElement.querySelector('.statistic__left');
-var statsTotalElement = statsElement.querySelector('.statistic__total');
-
-// создадим функции работы со статистикой
-/**
- * отрисовывает статистику в DOM
- */
-function renderStats() {
-    statsDoneElement.textContent = stats.done;
-    statsTodoElement.textContent = stats.todo;
-    statsTotalElement.textContent = stats.done + stats.todo;
-}
-
-// теперь на каждое из действий — обновление статистики
-/**
- * добавляет значение к статистике и обновляет DOM
- * @param {boolean} isTodo — статус новой тудушки
- */
-function addToStats(isTodo) {
-    if (isTodo) {
-        stats.todo++;
-    } else {
-        stats.done++;
-    }
-    renderStats();
-}
-
-/**
- * измененяет статус тудушки и обновляет DOM
- * @param {boolean} isTodo статус после изменения
- */
-function changeStats(isTodo) {
-    if (isTodo) {
-        stats.todo++;
-        stats.done--;
-    } else {
-        stats.todo--;
-        stats.done++;
-    }
-    renderStats();
-}
-
-/**
- * отрабатывает удаление тудушки и обновляет DOM
- * @param {boolean} isTodo статус удаленной тудушки
- */
-function deleteFromStats(isTodo) {
-    if (isTodo) {
-        stats.todo--;
-    } else {
-        stats.done--;
-    }
-    renderStats();
-}
-
-
 class Statistic {
     constructor(todo, done) {
         this.todo = todo;
         this.done = done;
-        this.statsElement = document.querySelector('.statistic');
-        this.statsDoneElement = statsElement.querySelector('.statistic__done');
-        this.statsTodoElement = statsElement.querySelector('.statistic__left');
-        this.statsTotalElement = statsElement.querySelector('.statistic__total');
+        //this.statsElement = document.querySelector('.statistic');
+        this.statsDoneElement = document.querySelector('.statistic__done');
+        this.statsTodoElement = document.querySelector('.statistic__left');
+        this.statsTotalElement = document.querySelector('.statistic__total');
     }
 
     render() {
@@ -423,6 +372,7 @@ function checkTodo(name) {
 function getTodo(todoName) {
     for (var i = 0; i < todoList.length; i++) {
         if (todoList[i].name === todoName) {
+            //todoList[i].date.updateAccessDate();
             return todoList[i];
         }
     }
@@ -468,6 +418,7 @@ function changeTodoStatus(element) {
     var isTodo = task.status === 'todo';
     // меняем статус в todoList
     task.status = isTodo ? 'done' : 'todo';
+    task.date.updateAccessDate();
 
     // при фильтре "все" нужно поменять класс у тудушки, иначе удалить
     if (currentFilter === filterValues.ALL) {
@@ -503,11 +454,6 @@ var tasksDone = todoList.filter(function (item) {
 }).length;
 
 var statistic = new Statistic(todoList.length - tasksDone, tasksDone);
-
-stats = {
-    done: tasksDone,
-    todo: todoList.length - tasksDone
-};
-renderStats();
+statistic.render();
 // Дата создания и редактирования в Todo
 
