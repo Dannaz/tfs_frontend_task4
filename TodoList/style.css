@@ -136,6 +136,8 @@ body {
 }
 
 .task__name {
+    width: 100%;
+    margin-left: auto;
     display: block;
     white-space: nowrap;
     text-overflow: ellipsis;
@@ -208,3 +210,19 @@ body {
 }
 
 /*=====  End of STATISTIC  ======*/
+
+/*=================================
+=           TodoDatetime          =
+=================================*/
+
+.task__info {
+    display: flex;
+    align-items: center;
+}
+
+.task__datetime {
+    width: 60px;
+    font-size: 10px;
+}
+
+/*===    End DateTime         ===*/

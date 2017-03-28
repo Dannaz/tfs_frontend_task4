@@ -1,5 +1,29 @@
 "use strict";
 
+class AccessDate {
+    constructor() {
+        this._date = new Date();
+    }
+
+    get formatedDate() {
+        var date;
+        var month = this._date.getMonth() + 1;
+        var time = `${this._date.getHours()}:${this._date.getMinutes()}:${this._date.getSeconds()}`;
+
+        if (month.toString().length === 1) {
+            month = "0" + month.toString();
+        }
+        date = `${this._date.getDate()}/${month}/${this._date.getFullYear().toString().slice(2)}`;
+
+        return `${time} ${date}`;
+    }
+
+    updateAccessDate () {
+        this._date = new Date();
+    }
+
+}
+
 var listElement = document.querySelector('.list');
 var itemElementList = listElement.children;
 
@@ -11,6 +35,7 @@ var templateContainer = 'content' in templateElement ? templateElement.content :
 /**
  * @typedef {Object} TodoItem
  * @property {string} name - имя тудушки
+ * @property {AccessDate} date - date
  * @property {string} status - статус
  */
 
@@ -20,26 +45,32 @@ var templateContainer = 'content' in templateElement ? templateElement.content :
 var todoList = [
     {
         name: 'Позвонить в сервис',
+        date: new AccessDate(),
         status: 'todo'
     },
     {
         name: 'Купить хлеб',
+        date: new AccessDate(),
         status: 'done'
     },
     {
         name: 'Захватить мир',
+        date: new AccessDate(),
         status: 'todo'
     },
     {
         name: 'Добавить тудушку в список',
+        date: new AccessDate(),
         status: 'todo'
     }
 ];
+console.log(todoList);
 
 // функция по генерации элементов
 function addTodoFromTemplate(todo) {
     var newElement = templateContainer.querySelector('.task').cloneNode(true);
     newElement.querySelector('.task__name').textContent = todo.name;
+    newElement.querySelector('.task__datetime').textContent = todo.date.formatedDate;
     setTodoStatusClassName(newElement, todo.status === 'todo');
 
     return newElement;
@@ -73,17 +104,10 @@ function isDeleteBtn(target) {
     return target.classList.contains('task__delete-button');
 }
 
-function checkIfTodoAlreadyExists(todoName) {
-    var todoElements = listElement.querySelectorAll('.task__name');
-    var namesList = Array.prototype.map.call(todoElements, function (element) {
-        return element.textContent;
-    });
-    return namesList.indexOf(todoName) > -1;
-}
-
 function createNewTodo(name) {
     return {
         name: name,
+        date: new AccessDate(),
         status: 'todo'
     }
 }
@@ -425,6 +449,7 @@ function addTodo(name) {
  * @param {TodoItem} todo
  */
 function insertTodoElement(todo) {
+    console.log(todo);
     var elem = addTodoFromTemplate(todo);
     listElement.insertBefore(elem, listElement.firstElementChild);
     // addToStats(todo.status === 'todo');
@@ -486,21 +511,3 @@ stats = {
 renderStats();
 // Дата создания и редактирования в Todo
 
-class AccessDate {
-    constructor() {
-        this._date = new Date();
-    }
-
-    get formatedDate() {
-        var date;
-        var month = this._date.getMonth() + 1;
-        var time = `${this._date.getHours()}:${this._date.getMinutes()}:${this._date.getSeconds()}`;
-
-        if (month.toString().length === 1) {
-            month = "0" + month.toString();
-        }
-        date = `${this._date.getDate()}/${month}/${this._date.getFullYear().toString().slice(2)}`;
-
-        return `${time} ${date}`;
-    }
-}
