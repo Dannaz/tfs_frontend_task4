@@ -1,43 +1,69 @@
-var randomButtonElement = document.getElementById('randomize');
+var randomButtonPromiseElement = document.getElementById('randomizePromise');
 var randomUserElement = document.getElementById('user');
 var errorElement = document.getElementById('error');
 
-randomButtonElement.onclick = function () {
-    makeGetRequest('https://api.github.com/users',
-        function (request) {
-            var data;
-            try {
-                data = JSON.parse(request)
-            } catch (err) {
-                showError(new Error('Ошибка при чтении из json'));
-            }
-            if (data) {
-                var user = data[Math.floor(Math.random() * data.length)];
-                loadImage(user.avatar_url, function() {
-                    hideError();
-                    drawUser(user);
-                }, showError);
-            }
-        }, showError);
+
+randomButtonPromiseElement.onclick = function() {
+    var method = 'GET';
+    var url = 'https://api.github.com/users';
+
+    makeRequestPromise(method,url)
+        .catch(err => {
+            throw err
+        })
+        .then(data => {
+            return JSON.parse(data);
+        })
+        .catch(err => {
+            throw err;
+        })
+        .then(users => {
+            return users[Math.floor(Math.random() * users.length)];
+        })
+        .then(user => Promise.all([user,loadUserImage(user)]))
+        .then(data => {
+            hideError();
+            drawUser(data[0]);
+        })
+        .catch(err => {
+            showError(err);
+        });
+
 };
 
-function makeGetRequest(url, successCallback, errorCallback) {
-    var xhr = new XMLHttpRequest();
-    xhr.open('GET', url, true);
-    xhr.onreadystatechange = function () {
-        if (xhr.readyState != 4) return;
+function makeRequestPromise(method, url) {
+    return new Promise(function (resolve, reject) {
+        var xhr = new XMLHttpRequest();
+        xhr.open(method,url,true);
 
-        if (xhr.status != 200) {
-            var error = new Error('Ошибка ' + xhr.status);
-            error.code = xhr.statusText;
-            errorCallback(error);
-        } else {
-            successCallback(xhr.responseText);
-        }
+        xhr.onreadystatechange = function() {
+            if (xhr.readyState != 4) return;
 
-    };
+            if (xhr.status != 200) {
+                reject(new Error('O_o'));
+            }
 
-    xhr.send();
+            resolve(xhr.responseText);
+        };
+
+        xhr.send();
+    });
+}
+
+function loadUserImage(user) {
+    return new Promise(function(resolve, reject){
+        let img = new Image();
+
+        img.onload = function() {
+            resolve(true);
+        };
+
+        img.onerror = function() {
+            reject(new Error('Ошибка загрузки изображения'));
+        };
+
+        img.src = user.avatar_url;
+    });
 }
 
 function showError(err) {
@@ -49,20 +75,6 @@ function showError(err) {
 function hideError() {
     errorElement.classList.add('hidden');
     randomUserElement.classList.remove('hidden');
-}
-
-
-function loadImage(imageUrl, successCallback, errorCallback) {
-    var img = new Image();
-
-    img.onload = function () {
-        successCallback(img);
-    };
-
-    img.onerror = function () {
-        errorCallback(new Error('Что-то пошло не так'));
-    };
-    img.src = imageUrl;
 }
 
 function drawUser(data) {
