@@ -1,4 +1,7 @@
 # Четвертое домашнее задание
+## Todolist - [gh-pages](https://dannaz.github.io/)
+## Promise - [js-bin](https://jsbin.com/tujonec/edit?js,output)
+
 ## ДЗ 4.1. Todolist
 - [Перепишите](https://github.com/aalexeev239/tfs-todolist-vanilla-js) функцию работы со статистикой с использованием прототипов: 
 создайте класс Statistic и методы по управлению статистикой.
