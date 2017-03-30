@@ -16,25 +16,22 @@ class AccessDate {
 
     get formattedDate() {
         var date, time;
-        var day = convertToTwoCharacterRepresentation(this._date.getDate()),
-            month = convertToTwoCharacterRepresentation(this._date.getMonth() + 1),
+        var day = this.convertToTwoCharacterRepresentation(this._date.getDate()),
+            month = this.convertToTwoCharacterRepresentation(this._date.getMonth() + 1),
             year = this._date.getFullYear().toString().slice(2);
 
-        var hours = convertToTwoCharacterRepresentation(this._date.getHours()),
-            minutes = convertToTwoCharacterRepresentation(this._date.getMinutes()),
-            seconds = convertToTwoCharacterRepresentation(this._date.getSeconds());
+        var hours = this.convertToTwoCharacterRepresentation(this._date.getHours()),
+            minutes = this.convertToTwoCharacterRepresentation(this._date.getMinutes()),
+            seconds = this.convertToTwoCharacterRepresentation(this._date.getSeconds());
 
         time = `${hours}:${minutes}:${seconds}`;
         date = `${day}/${month}/${year}`;
 
         return `${time} ${date}`;
+    }
 
-        function convertToTwoCharacterRepresentation(value) {
-            if (value.toString().length === 1){
-                value = "0" + value.toString();
-            }
-            return value;
-        }
+    convertToTwoCharacterRepresentation(value) {
+        return ("0" + value).substr(-2);
     }
 
 

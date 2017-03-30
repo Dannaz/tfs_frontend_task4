@@ -8,26 +8,14 @@ randomButtonPromiseElement.onclick = function() {
     var url = 'https://api.github.com/users';
 
     makeRequestPromise(method,url)
-        .catch(err => {
-            throw err
-        })
-        .then(data => {
-            return JSON.parse(data);
-        })
-        .catch(err => {
-            throw err;
-        })
-        .then(users => {
-            return users[Math.floor(Math.random() * users.length)];
-        })
+        .then(data => JSON.parse(data))
+        .then(users => users[Math.floor(Math.random() * users.length)])
         .then(user => Promise.all([user,loadUserImage(user)]))
         .then(data => {
             hideError();
             drawUser(data[0]);
         })
-        .catch(err => {
-            showError(err);
-        });
+        .catch(err => showError(err));
 
 };
 
@@ -54,8 +42,10 @@ function loadUserImage(user) {
     return new Promise(function(resolve, reject){
         let img = new Image();
 
+        img.user = user;
+
         img.onload = function() {
-            resolve(true);
+            resolve(this.user);
         };
 
         img.onerror = function() {
@@ -78,6 +68,7 @@ function hideError() {
 }
 
 function drawUser(data) {
+    console.log(data);
     var img = randomUserElement.querySelector('img');
     var link = randomUserElement.querySelector('a');
     img.src = data.avatar_url;
