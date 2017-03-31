@@ -10,10 +10,10 @@ randomButtonPromiseElement.onclick = function() {
     makeRequestPromise(method,url)
         .then(data => JSON.parse(data))
         .then(users => users[Math.floor(Math.random() * users.length)])
-        .then(user => Promise.all([user,loadUserImage(user)]))
-        .then(data => {
+        .then(user => loadUserImage(user))
+        .then(user => {
             hideError();
-            drawUser(data[0]);
+            drawUser(user);
         })
         .catch(err => showError(err));
 
@@ -42,10 +42,9 @@ function loadUserImage(user) {
     return new Promise(function(resolve, reject){
         let img = new Image();
 
-        img.user = user;
-
         img.onload = function() {
-            resolve(this.user);
+            console.log(user);
+            resolve(user);
         };
 
         img.onerror = function() {
@@ -67,12 +66,11 @@ function hideError() {
     randomUserElement.classList.remove('hidden');
 }
 
-function drawUser(data) {
-    console.log(data);
+function drawUser(user) {
     var img = randomUserElement.querySelector('img');
     var link = randomUserElement.querySelector('a');
-    img.src = data.avatar_url;
-    img.alt = data.login;
-    link.href = data.html_url;
-    link.textContent = data.login;
+    img.src = user.avatar_url;
+    img.alt = user.login;
+    link.href = user.html_url;
+    link.textContent = user.login;
 }
